@@ -1,7 +1,7 @@
 {
-  "name": "fp-ts",
-  "version": "2.16.9",
-  "description": "Functional programming in TypeScript",
+  "name": "fp-ts-rust",
+  "version": "2.16.10",
+  "description": "Functional programming in TypeScript with Rust-like error handling",
   "main": "./lib/index.js",
   "module": "./es6/index.js",
   "typings": "lib/index.d.ts",

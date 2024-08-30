@@ -23,7 +23,7 @@ import { Applicative, Applicative2C } from './Applicative'
 import { Apply2C } from './Apply'
 import { Bifunctor2 } from './Bifunctor'
 import { Chain2C } from './Chain'
-import { Either, Left, Right } from './Either'
+import { Either, LeftWithMethods, RightWithMethods } from './Either'
 import { Eq, fromEquals } from './Eq'
 import { Foldable2 } from './Foldable'
 import {
@@ -80,7 +80,7 @@ export type These<E, A> = Either<E, A> | Both<E, A>
  * @category refinements
  * @since 2.0.0
  */
-export const isLeft = <E>(fa: These<E, unknown>): fa is Left<E> => fa._tag === 'Left'
+export const isLeft = <E>(fa: These<E, unknown>): fa is LeftWithMethods<E> => fa._tag === 'Left'
 
 /**
  * Returns `true` if the these is an instance of `Right`, `false` otherwise
@@ -88,7 +88,7 @@ export const isLeft = <E>(fa: These<E, unknown>): fa is Left<E> => fa._tag === '
  * @category refinements
  * @since 2.0.0
  */
-export const isRight = <A>(fa: These<unknown, A>): fa is Right<A> => fa._tag === 'Right'
+export const isRight = <A>(fa: These<unknown, A>): fa is RightWithMethods<A> => fa._tag === 'Right'
 
 /**
  * Returns `true` if the these is an instance of `Both`, `false` otherwise
@@ -109,7 +109,9 @@ export function isBoth<E, A>(fa: These<E, A>): fa is Both<E, A> {
  * @since 2.0.0
  */
 export function left<E = never, A = never>(left: E): These<E, A> {
-  return { _tag: 'Left', left }
+  // I don't plan on using these methods okou or okouerro on these for now
+  // so it is listed as any
+  return { _tag: 'Left', left, okOu: '' as any, okOuErro: '' as any }
 }
 
 /**
@@ -117,7 +119,9 @@ export function left<E = never, A = never>(left: E): These<E, A> {
  * @since 2.0.0
  */
 export function right<E = never, A = never>(right: A): These<E, A> {
-  return { _tag: 'Right', right }
+  // I don't plan on using these methods okou or okouerro on these for now
+  // so it is listed as any
+  return { _tag: 'Right', right, okOu: '' as any, okOuErro: '' as any }
 }
 
 /**
