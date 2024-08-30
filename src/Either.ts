@@ -127,11 +127,22 @@ export interface Right<A> {
   readonly right: A
 }
 
+export interface LeftWithMethods<E> extends Left<E> {
+  okOuErro(): never
+  okOu<B>(defaultValue: B): B
+}
+
+export interface RightWithMethods<A> extends Right<A> {
+  okOuErro(): A
+  okOu(defaultValue: A): A
+}
+
 /**
  * @category model
  * @since 2.0.0
  */
-export type Either<E, A> = Left<E> | Right<A>
+export type Either<E, A> = LeftWithMethods<E> | RightWithMethods<A>
+
 
 // -------------------------------------------------------------------------------------
 // constructors
@@ -964,7 +975,7 @@ export const fromOption: <E>(onNone: LazyArg<E>) => <A>(fa: Option<A>) => Either
  * @category refinements
  * @since 2.0.0
  */
-export const isLeft: <E>(ma: Either<E, unknown>) => ma is Left<E> = _.isLeft
+export const isLeft = <E, A>(ma: Either<E, A>): ma is LeftWithMethods<E> => ma._tag === 'Left'
 
 /**
  * Returns `true` if the either is an instance of `Right`, `false` otherwise.
@@ -972,7 +983,7 @@ export const isLeft: <E>(ma: Either<E, unknown>) => ma is Left<E> = _.isLeft
  * @category refinements
  * @since 2.0.0
  */
-export const isRight: <A>(ma: Either<unknown, A>) => ma is Right<A> = _.isRight
+export const isRight = <E, A>(ma: Either<E, A>): ma is RightWithMethods<A> => ma._tag === 'Right'
 
 /**
  * Less strict version of [`match`](#match).
@@ -1781,6 +1792,19 @@ export const either: Monad2<URI> &
  */
 export const getApplySemigroup: <E, A>(S: Semigroup<A>) => Semigroup<Either<E, A>> =
   /*#__PURE__*/ getApplySemigroup_(Apply)
+
+/**
+ * Unwraps the value from a Right or throws the error from a Left.
+ *
+ * @category error handling
+ * @since [NEXT_VERSION] // Replace with the appropriate version number
+ */
+export const okOuErro = <E, A>(ma: Either<E, A>): A => {
+  if (isLeft(ma)) {
+    throw ma.left
+  }
+  return ma.right as A
+}
 
 /**
  * Use [`getApplicativeMonoid`](./Applicative.ts.html#getapplicativemonoid) instead.

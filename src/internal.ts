@@ -1,4 +1,4 @@
-import { Either, Left, Right } from './Either'
+import { Either, Left, LeftWithMethods, Right, RightWithMethods } from './Either'
 import { dual } from './function'
 import { IO } from './IO'
 import { NonEmptyArray } from './NonEmptyArray'
@@ -28,16 +28,46 @@ export const some = <A>(a: A): Option<A> => ({ _tag: 'Some', value: a })
 // -------------------------------------------------------------------------------------
 
 /** @internal */
-export const isLeft = <E>(ma: Either<E, unknown>): ma is Left<E> => ma._tag === 'Left'
+export const isLeft = <E, A>(ma: Either<E, A>): ma is LeftWithMethods<E> => ma._tag === 'Left'
 
 /** @internal */
-export const isRight = <A>(ma: Either<unknown, A>): ma is Right<A> => ma._tag === 'Right'
+export const isRight = <E, A>(ma: Either<E, A>): ma is RightWithMethods<A> => ma._tag === 'Right'
 
 /** @internal */
-export const left = <E, A = never>(e: E): Either<E, A> => ({ _tag: 'Left', left: e })
+const leftProto = {
+  okOuErro<E>(this: Left<E>): never {
+    throw this.left
+  },
+  okOu<E, B>(this: Left<E>, defaultValue: B): B {
+    return defaultValue
+  }
+}
+
+export const left = <E, A = never>(e: E): Either<E, A> => {
+  const l = Object.assign(Object.create(leftProto), {
+    _tag: 'Left' as const,
+    left: e
+  })
+  return l as LeftWithMethods<E>
+}
 
 /** @internal */
-export const right = <A, E = never>(a: A): Either<E, A> => ({ _tag: 'Right', right: a })
+const rightProto = {
+  okOuErro<A>(this: Right<A>): A {
+    return this.right
+  },
+  okOu<A>(this: Right<A>, _defaultValue: A): A {
+    return this.right
+  }
+}
+
+export const right = <A, E = never>(a: A): Either<E, A> => {
+  const r = Object.assign(Object.create(rightProto), {
+    _tag: 'Right' as const,
+    right: a
+  })
+  return r as RightWithMethods<A>
+}
 
 // -------------------------------------------------------------------------------------
 // ReadonlyNonEmptyArray

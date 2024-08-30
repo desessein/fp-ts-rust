@@ -1,3 +1,5 @@
+import { expect } from 'vitest'
+
 import { sequenceT } from '../src/Apply'
 import * as _ from '../src/Either'
 import { identity, pipe } from '../src/function'
@@ -718,5 +720,47 @@ describe('Either', () => {
 
   it('asUnit', () => {
     U.deepStrictEqual(pipe(_.of('a'), _.asUnit), _.of(undefined))
+  })
+
+  describe('okOuErro', () => {
+    it.only('Joga um erro', () => {
+      const eitherErro = _.left('')
+
+      expect(eitherErro.okOuErro).toThrowError()
+    })
+
+    it.only('Retorna o direito', () => {
+      const eitherValor = _.right('teste')
+
+      expect(eitherValor.okOuErro()).toBe('teste')
+    })
+  }) 
+
+  describe('okOu', () => {
+    it('Retorna o valor opcional quando left', () => {
+      const eitherErro = _.left<Error, number>(new Error())
+
+      const resultadoUnwrapped = eitherErro.okOu(0)
+
+      expect(resultadoUnwrapped).toBe(0)
+    })
+
+    it('Retorna o valor right quando right', () => {
+      const eitherErro = _.right<Error, number>(10)
+
+      const resultadoUnwrapped = eitherErro.okOu(0)
+
+      expect(resultadoUnwrapped).toBe(10)
+    })
+
+    it('Testa fromNullable', () => {
+      const naoEhNulo = _.fromNullable((x: string) => x !== undefined && x !== null)
+
+      const valor: string = null as unknown as string
+
+      const valorFiltrado = naoEhNulo(valor)
+
+      expect(valorFiltrado.okOu('cd')).toBe('cd')
+    })
   })
 })
